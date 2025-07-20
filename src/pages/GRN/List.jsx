@@ -4,15 +4,27 @@ import {
   TableContainer, Typography, Button, Box
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
 import api from '../../api/axios';
 
 const GRNList = () => {
   const [grns, setGrns] = useState([]);
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     api.get('/grns').then(res => setGrns(res.data));
   }, []);
+
+  const handleDelete = async (id) => {
+  try {
+    await api.delete(`/grns/${id}`);
+    enqueueSnackbar("GRN deleted successfully", { variant: "success" });
+    setGrns((prev) => prev.filter((g) => g._id !== id));
+  } catch (error) {
+    enqueueSnackbar("Failed to delete GRN", { variant: "error" });
+  }
+};
 
   return (
     <Box p={3}>
@@ -64,9 +76,9 @@ const GRNList = () => {
                   ₹ {grn.totalAmount?.toFixed(2) ?? 'N/A'}
                 </TableCell>
                 <TableCell align="center">
-                  <Button size="small" variant="outlined" color="primary">View</Button>{' '}
-                  <Button size="small" variant="outlined" color="secondary">Edit</Button>{' '}
-                  <Button size="small" variant="outlined" color="error">Delete</Button>
+                  <Button size="small" variant="outlined" color="primary" onClick={() => navigate(`/grn/view/${grn._id}`)}>View</Button>{' '}
+                  <Button size="small" variant="outlined" color="secondary" onClick={() => navigate(`/grn/edit/${grn._id}`)}>Edit</Button>{' '}
+                  <Button size="small" variant="outlined" color="error" onClick={() => handleDelete(grn._id)}>Delete</Button>
                 </TableCell>
               </TableRow>
             ))}

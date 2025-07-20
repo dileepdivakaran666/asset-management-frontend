@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Divider,
   Drawer,
   IconButton,
   List,
@@ -8,8 +7,11 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Divider,
   styled,
-  useTheme
+  Tooltip,
+  SvgIcon,
+  useTheme,
 } from '@mui/material';
 import {
   ChevronLeft,
@@ -19,9 +21,9 @@ import {
   Business,
   People,
   Settings,
-  Dashboard
+  Dashboard,
 } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -33,7 +35,6 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 const Sidebar = ({ drawerWidth = 240 }) => {
   const theme = useTheme();
-  const navigate = useNavigate();
   const [open, setOpen] = useState(true);
 
   const toggleDrawer = () => {
@@ -45,17 +46,14 @@ const Sidebar = ({ drawerWidth = 240 }) => {
     {
       text: 'Transactions',
       icon: <Receipt />,
-      subItems: [
-        { text: 'GRN', path: '/grn/list' },
-        { text: 'Issuance', path: '/issuance' },
-      ],
+      subItems: [{ text: 'GRN', path: '/grn/list' }],
     },
     {
       text: 'Masters',
       icon: <Inventory />,
       subItems: [
         { text: 'Asset Categories', path: '/asset-categories' },
-        { text: 'Subcategories', path: '/subcategories' },
+        { text: 'Subcategories', path: '/asset-subcategories' },
         { text: 'Vendors', path: '/vendors' },
         { text: 'Manufacturers', path: '/manufacturers' },
       ],
@@ -65,30 +63,25 @@ const Sidebar = ({ drawerWidth = 240 }) => {
     { text: 'Settings', icon: <Settings />, path: '/settings' },
   ];
 
-  const handleNavigation = (path) => {
-    navigate(path);
-  };
-
   return (
     <Drawer
+      variant="permanent"
+      open={open}
       sx={{
         width: open ? drawerWidth : 72,
         flexShrink: 0,
         '& .MuiDrawer-paper': {
           width: open ? drawerWidth : 72,
-          boxSizing: 'border-box',
           transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,
           }),
           overflowX: 'hidden',
-          marginTop: '64px', // Matches AppBar height
-      height: 'calc(100vh - 64px)', // Subtract AppBar height
+          boxSizing: 'border-box',
+          marginTop: '64px',
+          height: 'calc(100vh - 64px)',
         },
       }}
-      variant="permanent"
-      anchor="left"
-      open={open}
     >
       <DrawerHeader>
         <IconButton onClick={toggleDrawer}>
@@ -100,75 +93,88 @@ const Sidebar = ({ drawerWidth = 240 }) => {
         {menuItems.map((item) => (
           <React.Fragment key={item.text}>
             {item.path ? (
-              <ListItem 
-                disablePadding
-                sx={{ display: 'block' }}
+              <NavLink
+                to={item.path}
+                style={({ isActive }) => ({
+                  textDecoration: 'none',
+                  color: isActive ? '#1976d2' : 'inherit',
+                  backgroundColor: isActive ? '#e3f2fd' : 'transparent',
+                  borderRadius: 8,
+                  display: 'block',
+                })}
               >
-                <ListItemButton
-                  sx={{
-                    minHeight: 48,
-                    justifyContent: open ? 'initial' : 'center',
-                    px: 2.5,
-                  }}
-                  onClick={() => handleNavigation(item.path)}
-                >
-                  <ListItemIcon
-                    sx={{
-                      minWidth: 0,
-                      mr: open ? 3 : 'auto',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    {item.icon}
-                  </ListItemIcon>
-                  <ListItemText 
-                    primary={item.text} 
-                    sx={{ opacity: open ? 1 : 0 }} 
-                  />
-                </ListItemButton>
-              </ListItem>
+                <Tooltip title={!open ? item.text : ''} placement="right">
+                  <ListItem disablePadding sx={{ display: 'block' }}>
+                    <ListItemButton
+                      sx={{
+                        minHeight: 48,
+                        justifyContent: open ? 'initial' : 'center',
+                        px: 2.5,
+                      }}
+                    >
+                      <ListItemIcon
+                        sx={{
+                          minWidth: 0,
+                          mr: open ? 3 : 'auto',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <SvgIcon color="primary">{item.icon}</SvgIcon>
+                      </ListItemIcon>
+                      <ListItemText primary={item.text} sx={{ opacity: open ? 1 : 0 }} />
+                    </ListItemButton>
+                  </ListItem>
+                </Tooltip>
+              </NavLink>
             ) : (
               <>
-                <ListItemButton
-                  sx={{
-                    minHeight: 48,
-                    justifyContent: open ? 'initial' : 'center',
-                    px: 2.5,
-                  }}
-                >
-                  <ListItemIcon
+                <Tooltip title={!open ? item.text : ''} placement="right">
+                  <ListItemButton
                     sx={{
-                      minWidth: 0,
-                      mr: open ? 3 : 'auto',
-                      justifyContent: 'center',
+                      minHeight: 48,
+                      justifyContent: open ? 'initial' : 'center',
+                      px: 2.5,
                     }}
                   >
-                    {item.icon}
-                  </ListItemIcon>
-                  <ListItemText 
-                    primary={item.text} 
-                    sx={{ opacity: open ? 1 : 0 }} 
-                  />
-                </ListItemButton>
+                    <ListItemIcon
+                      sx={{
+                        minWidth: 0,
+                        mr: open ? 3 : 'auto',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <SvgIcon color="primary">{item.icon}</SvgIcon>
+                    </ListItemIcon>
+                    <ListItemText primary={item.text} sx={{ opacity: open ? 1 : 0 }} />
+                  </ListItemButton>
+                </Tooltip>
+
                 {open && item.subItems && (
                   <List disablePadding>
                     {item.subItems.map((subItem) => (
-                      <ListItem 
-                        key={subItem.text} 
-                        disablePadding
-                        sx={{ display: 'block' }}
+                      <NavLink
+                        key={subItem.text}
+                        to={subItem.path}
+                        style={({ isActive }) => ({
+                          textDecoration: 'none',
+                          color: isActive ? '#1976d2' : 'inherit',
+                          backgroundColor: isActive ? '#e3f2fd' : 'transparent',
+                          borderRadius: 8,
+                          display: 'block',
+                        })}
                       >
-                        <ListItemButton
-                          sx={{
-                            minHeight: 48,
-                            pl: 4,
-                            px: 2.5,
-                          }}
-                          onClick={() => handleNavigation(subItem.path)}
-                        >
-                          <ListItemText primary={subItem.text} />
-                        </ListItemButton>
-                      </ListItem>
+                        <ListItem disablePadding sx={{ display: 'block' }}>
+                          <ListItemButton
+                            sx={{
+                              minHeight: 40,
+                              pl: 5,
+                              px: 2.5,
+                            }}
+                          >
+                            <ListItemText primary={subItem.text} />
+                          </ListItemButton>
+                        </ListItem>
+                      </NavLink>
                     ))}
                   </List>
                 )}

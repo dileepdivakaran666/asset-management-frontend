@@ -92,7 +92,7 @@ const {
         const [vendorsRes, branchesRes, subcategoriesRes] = await Promise.all([
           api.get('/vendors'),
           api.get('/branches'),
-          api.get('/subcategories')
+          api.get('/asset-subcategories')
         ]);
         setVendors(vendorsRes.data);
         setBranches(branchesRes.data);
