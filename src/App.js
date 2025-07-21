@@ -16,6 +16,10 @@ import Vendors from './pages/Master/Vendors.jsx';
 import VendorForm from './components/master/VendorForm.jsx';
 import Manufacturers from './pages/Master/Manufacturers.jsx';
 import ManufacturerForm from './components/master/ManufacturerForm.jsx';
+import GRNView from './pages/GRN/GRNView.jsx';
+import GRNReport from './pages/Reports/GRNReport.jsx';
+import AssetSummery from './pages/Reports/AssetSummery.jsx';
+import Dashboard from './pages/Dashboard.jsx';
 
 function App() {
   return (
@@ -28,8 +32,16 @@ function App() {
             px: 3 }}>
                 <Routes>
                    <Route path="/" element={<MainLayout />}>
+                      <Route index element={<Dashboard/>} />
+
                       <Route path="/grn/list" element={<List />} />
                       <Route path="/grn/new" element={<GRNForm />} />
+                      <Route path="/grn/view/:id" element={<GRNView/>} />
+                      <Route path='/grn/edit/:id' element={<GRNForm/>}/>
+
+                      <Route path="/reports/grn-register" element={<GRNReport />} />
+                      <Route path="/reports/asset-summary" element={<AssetSummery />} />
+                      
 
                       <Route path="/asset-categories" element={<AssetCategories />} />
                       <Route path="/asset-categories/create" element={<AssetCategoryForm />} />
@@ -52,8 +64,6 @@ function App() {
                       <Route path="/manufacturers/edit/:id" element={<ManufacturerForm />} />
                     </Route>
                   
-                  
-                  <Route path="/grn/edit/:id" element={<GRNForm />} />
                   <Route path="/grns/drafts" element={<DraftGRNList />} />
                 </Routes>
         </Box>

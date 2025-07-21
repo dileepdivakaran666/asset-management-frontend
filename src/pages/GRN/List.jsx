@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   Table, TableHead, TableRow, TableCell, TableBody, Paper,
-  TableContainer, Typography, Button, Box
+  TableContainer, Typography, Button, Box, useTheme
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
@@ -9,8 +9,17 @@ import api from '../../api/axios';
 
 const GRNList = () => {
   const [grns, setGrns] = useState([]);
+  const theme = useTheme();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
+
+  const getStatusColor = (status) => {
+    switch(status) {
+      case 'submitted': return theme.palette.success.main;
+      case 'draft': return theme.palette.warning.main;
+      default: return theme.palette.text.secondary;
+    }
+  };
 
   useEffect(() => {
     api.get('/grns').then(res => setGrns(res.data));
@@ -28,7 +37,7 @@ const GRNList = () => {
 
   return (
     <Box p={3}>
-      <Typography variant="h5" gutterBottom>GRN List</Typography>
+      <Typography variant="h4" gutterBottom>GRN List</Typography>
       <Box sx={{ 
         display: 'flex',
         justifyContent: 'flex-end',
@@ -71,9 +80,30 @@ const GRNList = () => {
                 <TableCell>{grn.vendorId?.name}</TableCell>
                 <TableCell>{grn.branchId?.name}</TableCell>
                 <TableCell>{new Date(grn.grnDate).toLocaleDateString()}</TableCell>
-                <TableCell>{grn.status}</TableCell>
                 <TableCell>
-                  ₹ {grn.totalAmount?.toFixed(2) ?? 'N/A'}
+                  <Box display="flex" alignItems="center">
+                                          <Box 
+                                            sx={{
+                                              width: 10,
+                                              height: 10,
+                                              borderRadius: '50%',
+                                              bgcolor: getStatusColor(grn.status),
+                                              mr: 1
+                                            }} 
+                                          />
+                                          <Typography 
+                                            variant="body2"
+                                            sx={{ 
+                                              textTransform: 'capitalize',
+                                              color: getStatusColor(grn.status)
+                                            }}
+                                          >
+                                            {grn.status}
+                                          </Typography>
+                                        </Box>
+                </TableCell>
+                <TableCell>
+                  ₹ {grn.grandTotal?.toFixed(2) ?? 'N/A'}
                 </TableCell>
                 <TableCell align="center">
                   <Button size="small" variant="outlined" color="primary" onClick={() => navigate(`/grn/view/${grn._id}`)}>View</Button>{' '}

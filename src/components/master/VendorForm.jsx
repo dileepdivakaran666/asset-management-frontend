@@ -80,7 +80,7 @@ export default function VendorForm() {
 
   return (
     <Box sx={{ maxWidth: 600, mx: "auto", mt: 4 }}>
-      <Typography variant="h5" gutterBottom>
+      <Typography variant="h4" gutterBottom>
         {id ? "Edit" : "Create"} Vendor
       </Typography>
 

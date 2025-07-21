@@ -14,7 +14,7 @@ const TotalsPanel = ({ control }) => {
   const totalTax = lineItems.reduce((sum, item) => {
     const qty = parseFloat(item.quantity || 0);
     const price = parseFloat(item.unitPrice || 0);
-    const tax = parseFloat(item.tax || 0);
+    const tax = parseFloat(item.taxPercent || 0);
     return sum + (qty * price * tax) / 100;
   }, 0);
 

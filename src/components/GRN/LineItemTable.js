@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import {
+  Box,
   Table,
   TableBody,
   TableCell,
@@ -28,7 +29,7 @@ const LineItemTable = ({ control, fields, append, remove, register, errors, subc
     lineItems.forEach((item, index) => {
       const qty = parseFloat(item.quantity || 0);
       const price = parseFloat(item.unitPrice || 0);
-      const tax = parseFloat(item.tax || 0);
+      const tax = parseFloat(item.taxPercent || 0);
 
       const taxableValue = qty * price;
       const taxAmount = (taxableValue * tax) / 100;
@@ -44,6 +45,7 @@ const LineItemTable = ({ control, fields, append, remove, register, errors, subc
   }, [lineItems, setValue]);
 
   return (
+    <Box sx={{ width: '100%', overflowX: 'auto' }}>
     <TableContainer component={Paper} sx={{ mt: 2 }}>
       <Toolbar sx={{ pl: 0, pr: 0 }}>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
@@ -57,7 +59,7 @@ const LineItemTable = ({ control, fields, append, remove, register, errors, subc
               itemDescription: '',
               quantity: '',
               unitPrice: '',
-              tax: '',
+              taxPercent: '',
               taxableValue: 0,
               totalAmount: 0
             })
@@ -68,7 +70,7 @@ const LineItemTable = ({ control, fields, append, remove, register, errors, subc
         </Button>
       </Toolbar>
 
-      <Table size="small">
+      <Table size="small"  sx={{ minWidth: 1000 }}>
         <TableHead>
           <TableRow>
             <TableCell>#</TableCell>
@@ -86,7 +88,7 @@ const LineItemTable = ({ control, fields, append, remove, register, errors, subc
           {fields.map((item, index) => {
             const qty = parseFloat(lineItems?.[index]?.quantity || 0);
             const price = parseFloat(lineItems?.[index]?.unitPrice || 0);
-            const tax = parseFloat(lineItems?.[index]?.tax || 0);
+            const tax = parseFloat(lineItems?.[index]?.taxPercent || 0);
 
             const taxableValue = qty * price;
             const taxAmount = (taxableValue * tax) / 100;
@@ -158,9 +160,9 @@ const LineItemTable = ({ control, fields, append, remove, register, errors, subc
                       endAdornment: <InputAdornment position="end">%</InputAdornment>,
                     }}
                     inputProps={{ min: 0, max: 100 }}
-                    {...register(`lineItems.${index}.tax`)}
-                    error={Boolean(errors.lineItems?.[index]?.tax)}
-                    helperText={errors.lineItems?.[index]?.tax?.message}
+                    {...register(`lineItems.${index}.taxPercent`)}
+                    error={Boolean(errors.lineItems?.[index]?.taxPercent)}
+                    helperText={errors.lineItems?.[index]?.taxPercent?.message}
                   />
                 </TableCell>
                 <TableCell>
@@ -200,6 +202,7 @@ const LineItemTable = ({ control, fields, append, remove, register, errors, subc
         </TableBody>
       </Table>
     </TableContainer>
+    </Box>
   );
 };
 

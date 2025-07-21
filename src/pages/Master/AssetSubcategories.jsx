@@ -9,11 +9,17 @@ import {
   TableBody,
   TableContainer,
   Paper,
+  Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
+  Typography
 } from "@mui/material";
+import { useSnackbar } from "notistack";
 import { useNavigate } from "react-router-dom";
 
 export default function AssetSubcategories() {
+    const [deleteId, setDeleteId] = useState(null);
+const [openConfirm, setOpenConfirm] = useState(false);
   const [subcategories, setSubcategories] = useState([]);
+  const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
   const fetchData = async () => {
@@ -21,10 +27,27 @@ export default function AssetSubcategories() {
     setSubcategories(res.data);
   };
 
-  const handleDelete = async (id) => {
-    await api.delete(`/asset-subcategories/${id}`);
+  const confirmDelete = (id) => {
+  setDeleteId(id);
+  setOpenConfirm(true);
+};
+
+const handleDeleteConfirmed = async () => {
+  try {
+    await api.delete(`/asset-subcategories/${deleteId}`);
+    enqueueSnackbar("Subcategory deleted successfully!", { variant: "info" });
     fetchData();
-  };
+  } catch (err) {
+    enqueueSnackbar("Delete failed!", { variant: "error" });
+  }
+  setOpenConfirm(false);
+  setDeleteId(null);
+};
+
+//   const handleDelete = async (id) => {
+//     await api.delete(`/asset-subcategories/${id}`);
+//     fetchData();
+//   };
 
   useEffect(() => {
     fetchData();
@@ -32,7 +55,9 @@ export default function AssetSubcategories() {
 
   return (
     <>
-      <h2>Asset Subcategories</h2>
+    <Typography variant="h4" gutterBottom>
+      Asset Subcategories 
+    </Typography>
       <Button variant="contained" onClick={() => navigate("/asset-subcategories/create")}>
         + Add Subcategory
       </Button>
@@ -59,13 +84,30 @@ export default function AssetSubcategories() {
                 <TableCell>{sub.status ? "Active" : "Inactive"}</TableCell>
                 <TableCell>
                   <Button onClick={() => navigate(`/asset-subcategories/edit/${sub._id}`)}>Edit</Button>
-                  <Button color="error" onClick={() => handleDelete(sub._id)}>Delete</Button>
+                  <Button color="error" onClick={() => confirmDelete(sub._id)}>Delete</Button>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+      <Dialog open={openConfirm} onClose={() => setOpenConfirm(false)}>
+  <DialogTitle>Confirm Deletion</DialogTitle>
+  <DialogContent>
+    <DialogContentText>
+      Are you sure you want to delete this Sub Category? This action cannot be undone.
+    </DialogContentText>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={() => setOpenConfirm(false)} color="primary">
+      Cancel
+    </Button>
+    <Button onClick={handleDeleteConfirmed} color="error" autoFocus>
+      Delete
+    </Button>
+  </DialogActions>
+</Dialog>
+
     </>
   );
 }

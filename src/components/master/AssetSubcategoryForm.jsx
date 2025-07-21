@@ -51,6 +51,8 @@ export default function AssetSubcategoryForm() {
     },
   });
 
+  const status = watch("status");
+
   useEffect(() => {
     // Load categories
     api.get("/asset-categories").then((res) => {
@@ -92,7 +94,7 @@ export default function AssetSubcategoryForm() {
 
   return (
     <Box sx={{ maxWidth: 500, mx: "auto", mt: 4 }}>
-      <Typography variant="h5" gutterBottom>
+      <Typography variant="h4" gutterBottom>
         {id ? "Edit" : "Create"} Asset Subcategory
       </Typography>
 
@@ -136,7 +138,8 @@ export default function AssetSubcategoryForm() {
           />
 
           <FormControlLabel
-            control={<Switch {...register("status")} />}
+            control={<Switch checked={status}
+      onChange={(e) => setValue("status", e.target.checked)} />}
             label="Active"
           />
 

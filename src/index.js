@@ -1,17 +1,31 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+import { ThemeProvider } from '@mui/material/styles';
+import theme from './components/UI/theme'
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { SnackbarProvider } from 'notistack';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { MasterDataProvider } from './contexts/MasterDataContext';
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <Router>
       <SnackbarProvider maxSnack={3}>
-      <App />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+           <ThemeProvider theme={theme}>
+              <MasterDataProvider>
+                <App />
+              </MasterDataProvider>
+           </ThemeProvider>
+        </LocalizationProvider>
       </SnackbarProvider>
     </Router>
   </React.StrictMode>

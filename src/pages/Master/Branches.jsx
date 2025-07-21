@@ -9,6 +9,7 @@ import {
   TableBody,
   TableContainer,
   Paper,
+  Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle
 } from "@mui/material";
 import { useSnackbar } from "notistack";
 import { useNavigate } from "react-router-dom";
@@ -16,6 +17,8 @@ import { useNavigate } from "react-router-dom";
 export default function Branches() {
   const [branches, setBranches] = useState([]);
   const navigate = useNavigate();
+  const [deleteId, setDeleteId] = useState(null);
+const [openConfirm, setOpenConfirm] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
   const fetchData = async () => {
@@ -23,16 +26,32 @@ export default function Branches() {
     setBranches(res.data);
   };
 
-  const handleDelete = async (id) => {
-    try{
-        await api.delete(`/branches/${id}`);
-    enqueueSnackbar("Branch Deleted successfully!", { variant: "success" });
+  const confirmDelete = (id) => {
+  setDeleteId(id);
+  setOpenConfirm(true);
+};
+
+//   const handleDelete = async (id) => {
+//     try{
+//         await api.delete(`/branches/${id}`);
+//     enqueueSnackbar("Branch Deleted successfully!", { variant: "success" });
+//     fetchData();
+//     }catch (error) {
+//       enqueueSnackbar("Failed to delete branch", { variant: "error" });
+//     }
+//   };
+
+  const handleDeleteConfirmed = async () => {
+  try {
+    await api.delete(`/branches/${deleteId}`);
+    enqueueSnackbar("Branch Deleted successfully!", { variant: "info" });
     fetchData();
-    }catch (error) {
-      enqueueSnackbar("Failed to delete branch", { variant: "error" });
-    }
-    
-  };
+  } catch (err) {
+    enqueueSnackbar("Failed to delete branch", { variant: "error" });
+  }
+  setOpenConfirm(false);
+  setDeleteId(null);
+};
 
   useEffect(() => {
     fetchData();
@@ -64,13 +83,30 @@ export default function Branches() {
                 <TableCell>{branch.status ? "Active" : "Inactive"}</TableCell>
                 <TableCell>
                   <Button onClick={() => navigate(`/branches/edit/${branch._id}`)}>Edit</Button>
-                  <Button color="error" onClick={() => handleDelete(branch._id)}>Delete</Button>
+                  <Button color="error" onClick={() => confirmDelete(branch._id)}>Delete</Button>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+      <Dialog open={openConfirm} onClose={() => setOpenConfirm(false)}>
+  <DialogTitle>Confirm Deletion</DialogTitle>
+  <DialogContent>
+    <DialogContentText>
+      Are you sure you want to delete this Branch? This action cannot be undone.
+    </DialogContentText>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={() => setOpenConfirm(false)} color="primary">
+      Cancel
+    </Button>
+    <Button onClick={handleDeleteConfirmed} color="error" autoFocus>
+      Delete
+    </Button>
+  </DialogActions>
+</Dialog>
+
     </>
   );
 }

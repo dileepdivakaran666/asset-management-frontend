@@ -33,6 +33,7 @@ export default function AssetCategoryForm() {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
@@ -42,6 +43,8 @@ export default function AssetCategoryForm() {
       status: true,
     },
   });
+
+  const status = watch("status");
 
   // ✅ Fetch category data for edit
   useEffect(() => {
@@ -78,7 +81,7 @@ export default function AssetCategoryForm() {
 
   return (
     <Box sx={{ maxWidth: 500, mx: "auto", mt: 4 }}>
-      <Typography variant="h5" gutterBottom>
+      <Typography variant="h4" gutterBottom>
         {id ? "Edit" : "Create"} Asset Category
       </Typography>
 
@@ -103,7 +106,8 @@ export default function AssetCategoryForm() {
           />
 
           <FormControlLabel
-            control={<Switch {...register("status")} />}
+            control={<Switch checked={status}
+      onChange={(e) => setValue("status", e.target.checked)} />}
             label="Active"
           />
 

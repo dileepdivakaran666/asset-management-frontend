@@ -1,5 +1,5 @@
-import {Link, useNavigate} from 'react-router-dom';
-import { AppBar, Toolbar, Typography, Button } from '@mui/material';
+import { useNavigate} from 'react-router-dom';
+import { AppBar, Toolbar, Typography } from '@mui/material';
 // import { useAuth } from '../context/AuthContext';
 
 
@@ -18,9 +18,6 @@ function Header() {
            Asset Management App
           </Typography>
           
-
-          <Button color="inherit" component={Link} to="/about" sx={{textTransform:"none", mr:4}}>About Us</Button>
-          <Button color="inherit" component={Link} to="/contact" sx={{textTransform:"none", mr:4}}>Contact Us</Button>
         </Toolbar>
       </AppBar>
     </div>

@@ -71,7 +71,7 @@ export default function ManufacturerForm() {
 
   return (
     <Box sx={{ maxWidth: 500, mx: "auto", mt: 4 }}>
-      <Typography variant="h5" gutterBottom>
+      <Typography variant="h4" gutterBottom>
         {id ? "Edit" : "Create"} Manufacturer
       </Typography>
 
