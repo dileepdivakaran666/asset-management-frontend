@@ -62,14 +62,14 @@ const GRNList = () => {
         <Table>
           <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
             <TableRow>
-              <TableCell>GRN No.</TableCell>
-              <TableCell>Invoice</TableCell>
-              <TableCell>Vendor</TableCell>
-              <TableCell>Branch</TableCell>
-              <TableCell>Date</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Total</TableCell>
-              <TableCell align="center">Actions</TableCell>
+              <TableCell style={{ fontWeight: 'bold' }}>GRN No.</TableCell>
+              <TableCell style={{ fontWeight: 'bold' }}>Invoice</TableCell>
+              <TableCell style={{ fontWeight: 'bold' }}>Vendor</TableCell>
+              <TableCell style={{ fontWeight: 'bold' }}>Branch</TableCell>
+              <TableCell style={{ fontWeight: 'bold' }}>Date</TableCell>
+              <TableCell style={{ fontWeight: 'bold' }}>Status</TableCell>
+              <TableCell style={{ fontWeight: 'bold' }}>Total</TableCell>
+              <TableCell style={{ fontWeight: 'bold' }} align="center">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

@@ -7,6 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import HeaderForm from '../../components/GRN/HeaderForm';
 import LineItemTable from '../../components/GRN/LineItemTable';
 import TotalsPanel from '../../components/GRN/TotalsPanel';
+import {useMasterData} from '../../contexts/MasterDataContext';
 
 import { 
   Box, 
@@ -56,11 +57,10 @@ const grnSchema = yup.object().shape({
 const GRNForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [vendors, setVendors] = useState([]);
-  const [branches, setBranches] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const fileInputRef = useRef(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const { vendors, branches } = useMasterData();
   const [snackbar, setSnackbar] = useState({ 
     open: false, 
     message: '', 
@@ -105,13 +105,7 @@ const { isDirty } = methods.formState;
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [vendorsRes, branchesRes, subcategoriesRes] = await Promise.all([
-          api.get('/vendors'),
-          api.get('/branches'),
-          api.get('/asset-subcategories')
-        ]);
-        setVendors(vendorsRes.data);
-        setBranches(branchesRes.data);
+        const subcategoriesRes = await api.get('/asset-subcategories');
         setSubcategories(subcategoriesRes.data);
 
         if (id) {
@@ -204,63 +198,84 @@ const { isDirty } = methods.formState;
   };
 
   // Excel Import Handler
-  const handleImport = async (e) => {
+const handleImport = async (e) => {
   const file = e.target.files[0];
   if (!file) return;
+
+  // ✅ Step 1: File type validation
+  const allowedTypes = [
+    'application/vnd.ms-excel',                   // .xls
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' // .xlsx
+  ];
+  if (!allowedTypes.includes(file.type)) {
+    setSnackbar({
+      open: true,
+      message: 'Only Excel files (.xls, .xlsx) are allowed.',
+      severity: 'error'
+    });
+    return;
+  }
 
   setIsProcessing(true);
   try {
     const data = await importExcelData(file);
+
+    // ✅ Step 2: Validate required header fields
+    if (!data.header || !data.lineItems) {
+      throw new Error('Missing header or line items section in Excel.');
+    }
+
+    const requiredHeaderFields = ['grnNumber', 'grnDate', 'invoiceNumber', 'vendor', 'branch'];
+    for (const field of requiredHeaderFields) {
+      if (!data.header[field]) {
+        throw new Error(`Missing required field in header: ${field}`);
+      }
+    }
+
+    // ✅ Step 3: Validate each line item
+    for (const [index, item] of data.lineItems.entries()) {
+      if (!item.subcategory || !item.description || item.quantity == null || item.price == null || item.tax == null) {
+        throw new Error(`Missing required data in line item ${index + 1}`);
+      }
+
+      if (isNaN(item.quantity) || isNaN(item.price) || isNaN(item.tax)) {
+        throw new Error(`Invalid numeric values in line item ${index + 1}`);
+      }
+    }
+
+    // ✅ Step 4: Set header values
+    if (data.header.grnNumber) setValue('grnNumber', data.header.grnNumber);
+    if (data.header.grnDate) setValue('grnDate', data.header.grnDate);
+    if (data.header.invoiceNumber) setValue('invoiceNumber', data.header.invoiceNumber);
     
-    // Set header fields
-    if (data.header) {
-      if (data.header.grnNumber) setValue('grnNumber', data.header.grnNumber);
-      if (data.header.grnDate) setValue('grnDate', data.header.grnDate);
-      if (data.header.invoiceNumber) setValue('invoiceNumber', data.header.invoiceNumber);
-      
-      // Find vendor by name
-      if (data.header.vendor) {
-        const vendor = vendors.find(v => v.name === data.header.vendor);
-        if (vendor) setValue('vendorId', vendor._id);
-      }
-      
-      // Find branch by name
-      if (data.header.branch) {
-        const branch = branches.find(b => b.name === data.header.branch);
-        if (branch) setValue('branchId', branch._id);
-      }
-    }
+    const vendor = vendors.find(v => v.name === data.header.vendor);
+    if (vendor) setValue('vendorId', vendor._id);
 
-    // Set line items
-    if (data.lineItems && data.lineItems.length > 0) {
-      const mappedItems = data.lineItems.map(item => ({
-        subcategoryId: subcategories.find(s => s.name === item.subcategory)?._id || '',
-        itemDescription: item.description || '',
-        quantity: item.quantity || 0,
-        unitPrice: item.price || 0,
-        tax: item.tax || 0,
-        taxableValue: (item.quantity || 0) * (item.price || 0),
-        totalAmount: ((item.quantity || 0) * (item.price || 0)) * (1 + (item.tax || 0)/100)
-      }));
-      setValue('lineItems', mappedItems);
-    }
+    const branch = branches.find(b => b.name === data.header.branch);
+    if (branch) setValue('branchId', branch._id);
 
-    setSnackbar({ 
-      open: true, 
-      message: 'GRN data imported successfully!', 
-      severity: 'success' 
-    });
+    // ✅ Step 5: Set line items
+    const mappedItems = data.lineItems.map(item => ({
+      subcategoryId: subcategories.find(s => s.name === item.subcategory)?._id || '',
+      itemDescription: item.description || '',
+      quantity: +item.quantity,
+      unitPrice: +item.price,
+      tax: +item.tax,
+      taxableValue: +(item.quantity * item.price).toFixed(2),
+      totalAmount: +((item.quantity * item.price) * (1 + item.tax / 100)).toFixed(2)
+    }));
+    setValue('lineItems', mappedItems);
+
+    setSnackbar({ open: true, message: 'GRN data imported successfully!', severity: 'success' });
+
   } catch (error) {
-    setSnackbar({ 
-      open: true, 
-      message: 'Import failed: ' + error.message, 
-      severity: 'error' 
-    });
+    setSnackbar({ open: true, message: 'Import failed: ' + error.message, severity: 'error' });
   } finally {
     setIsProcessing(false);
     if (fileInputRef.current) fileInputRef.current.value = '';
   }
 };
+
 
   const onSubmit = async (data) => {
     setIsProcessing(true);
@@ -312,19 +327,19 @@ const { isDirty } = methods.formState;
   return (
     <Box p={3}>
       <Typography
-  variant="h3"
-  gutterBottom
-  sx={{
-    fontWeight: 800,
-    background: (theme) => theme.palette.mode === 'dark' 
-      ? 'linear-gradient(90deg, #4facfe 0%, #00f2fe 100%)' 
-      : 'linear-gradient(90deg, #1a237e 0%, #3949ab 100%)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    textTransform: 'none',
-    letterSpacing: '0.02em',
-  }}
->
+        variant="h3"
+        gutterBottom
+        sx={{
+          fontWeight: 800,
+          background: (theme) => theme.palette.mode === 'dark' 
+            ? 'linear-gradient(90deg, #4facfe 0%, #00f2fe 100%)' 
+            : 'linear-gradient(90deg, #1a237e 0%, #3949ab 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          textTransform: 'none',
+          letterSpacing: '0.02em',
+        }}
+      >
   {id ? 'Edit GRN' : 'Create GRN'}
 </Typography>
       <FormProvider {...methods}>
@@ -369,6 +384,7 @@ const { isDirty } = methods.formState;
 
             <Button
               variant="contained"
+              color='success'
               startIcon={isProcessing ? <CircularProgress size={20} /> : <Download />}
               onClick={handleExport}
               disabled={isProcessing || lineItems.length === 0}
@@ -381,8 +397,6 @@ const { isDirty } = methods.formState;
           register={register} 
           control={control} 
           errors={errors} 
-          vendors={vendors} 
-          branches={branches} 
           setValue={setValue}
         />
         <LineItemTable

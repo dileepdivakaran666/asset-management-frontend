@@ -53,36 +53,70 @@ const [openConfirm, setOpenConfirm] = useState(false);
   };
 
   // ✅ Excel Upload
-  const handleUploadExcel = async (e) => {
+const handleUploadExcel = async (e) => {
   const file = e.target.files[0];
   if (!file) return;
+
+  // ✅ Validate file type
+  const allowedTypes = [
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  ];
+  if (!allowedTypes.includes(file.type)) {
+    enqueueSnackbar('Only Excel files (.xls, .xlsx) are allowed.', { variant: 'error' });
+    return;
+  }
 
   const reader = new FileReader();
   reader.onload = async (evt) => {
     try {
       const data = new Uint8Array(evt.target.result);
-      const workbook = XLSX.read(data, { type: "array" });
+      const workbook = XLSX.read(data, { type: 'array' });
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const json = XLSX.utils.sheet_to_json(sheet);
 
+      // ✅ Validate sheet structure
+      if (!json.length) throw new Error('Excel sheet is empty');
+
+      const requiredFields = ['Name', 'Description', 'Status'];
+
+      for (let i = 0; i < json.length; i++) {
+        const row = json[i];
+
+        for (const field of requiredFields) {
+          if (!row[field]) {
+            throw new Error(`Missing "${field}" in row ${i + 2}`);
+          }
+        }
+
+        if (!['Active', 'Inactive'].includes(row.Status)) {
+          throw new Error(`Invalid status "${row.Status}" in row ${i + 2}. Use "Active" or "Inactive"`);
+        }
+      }
+
+      // ✅ Mapping to API format
       const mapped = json.map((row) => ({
-        name: row.Name || "",
-        description: row.Description || "",
-        status: row.Status === "Active",
+        name: row.Name.trim(),
+        description: row.Description.trim(),
+        status: row.Status === 'Active'
       }));
 
+      // ✅ Post to API
       for (const entry of mapped) {
-        await api.post("/asset-categories", entry);
+        await api.post('/asset-categories', entry);
       }
 
       fetchData();
-      enqueueSnackbar("Excel uploaded successfully!", { variant: "success" });
+      enqueueSnackbar('Excel uploaded successfully!', { variant: 'success' });
+
     } catch (err) {
-      enqueueSnackbar("Failed to upload Excel file!", { variant: "error" });
+      enqueueSnackbar('Upload failed: ' + err.message, { variant: 'error' });
     }
   };
+
   reader.readAsArrayBuffer(file);
 };
+
 
   return (
     <>

@@ -1,10 +1,16 @@
 import { useEffect } from 'react';
-import { Autocomplete, Grid, TextField, MenuItem } from '@mui/material';
-import { Controller } from 'react-hook-form';
-import { useFormContext } from 'react-hook-form';
+import {
+  Grid,
+  TextField,
+} from '@mui/material';
+// import { useFormContext } from 'react-hook-form';
+import { useMasterData } from '../../contexts/MasterDataContext';
+import AutoCompleteSelect from '../common/AutoCompleteSelect';
 
-const HeaderForm = ({ register, control, errors, vendors, branches, setValue }) => {
-  const { watch } = useFormContext();
+const HeaderForm = ({ register, control, errors, setValue }) => {
+  const { branches, vendors, loading } = useMasterData();
+  // const { watch } = useFormContext();
+
   useEffect(() => {
     const generateGRNNumber = () => {
       const now = new Date();
@@ -20,6 +26,7 @@ const HeaderForm = ({ register, control, errors, vendors, branches, setValue }) 
 
   return (
     <Grid container spacing={2}>
+      {/* GRN Number */}
       <Grid item xs={12} sm={6}>
         <TextField
           label="GRN Number"
@@ -28,6 +35,8 @@ const HeaderForm = ({ register, control, errors, vendors, branches, setValue }) 
           {...register('grnNumber')}
         />
       </Grid>
+
+      {/* GRN Date */}
       <Grid item xs={12} sm={6}>
         <TextField
           label="GRN Date"
@@ -39,6 +48,8 @@ const HeaderForm = ({ register, control, errors, vendors, branches, setValue }) 
           helperText={errors.grnDate?.message}
         />
       </Grid>
+
+      {/* Invoice Number */}
       <Grid item xs={12} sm={6}>
         <TextField
           label="Invoice Number"
@@ -49,71 +60,54 @@ const HeaderForm = ({ register, control, errors, vendors, branches, setValue }) 
         />
       </Grid>
 
+      {/* Vendor (AutoCompleteSelect) */}
       <Grid item xs={12} sm={6}>
-        <Controller
+        <AutoCompleteSelect
           name="vendorId"
+          label="Vendor"
           control={control}
+          options={vendors}
+          loading={loading}
+          getOptionLabel={(option) => option.name}
+          isOptionEqualToValue={(option, value) => option._id === value?._id}
           rules={{ required: 'Vendor is required' }}
-          render={({ field: { onChange, value, ...field } }) => (
-            <Autocomplete
-              options={vendors}
-              getOptionLabel={(option) => option.name}
-              isOptionEqualToValue={(option, value) => option._id === value?._id}
-              onChange={(_, data) => onChange(data?._id || '')}
-              value={vendors.find(v => v._id === value) || null}
-              renderInput={(params) => (
-                <TextField
-                sx={{ minWidth: 200 }}
-                  {...params}
-                  {...field}
-                  label="Vendor"
-                  fullWidth
-                  error={Boolean(errors.vendorId)}
-                  helperText={errors.vendorId?.message}
-                />
-              )}
-              filterOptions={(options, { inputValue }) =>
-                options.filter(option =>
-                  option.name.toLowerCase().includes(inputValue.toLowerCase())
-                )
-              }
-              noOptionsText="No vendors found"
-              componentsProps={{
-                paper: {
-                  sx: {
-                    minHeight: 200,
-                    maxHeight: 400
-                  }
-                }
-              }}
-              renderOption={(props, option) => (
-                <MenuItem {...props} key={option._id}>
-                  {option.name}
-                </MenuItem>
-              )}
-            />
-          )}
+          error={errors.vendorId}
+          helperText={errors.vendorId?.message}
         />
       </Grid>
 
+      {/* Branch (Dropdown) */}
       <Grid item xs={12} sm={6}>
-        <TextField
-        sx={{ minWidth: 200 }}
+        <AutoCompleteSelect
+          name="branchId"
+          label="Branch"
+          control={control}
+          options={branches}
+          loading={loading}
+          getOptionLabel={(option) => option.name}
+          isOptionEqualToValue={(option, value) => option._id === value?._id}
+          rules={{ required: 'Branch is required' }}
+          error={errors.branchId}
+          helperText={errors.branchId?.message}
+        />
+        {/* <TextField
+          sx={{ minWidth: 200 }}
           label="Branch"
           select
           fullWidth
-          defaultValue="" 
+          defaultValue=""
           {...register('branchId', { required: 'Branch is required' })}
           value={watch('branchId') || ''}
           error={Boolean(errors.branchId)}
           helperText={errors.branchId?.message}
         >
           {branches.map(b => (
-            <MenuItem key={b._id} value={b._id}>{b.name}</MenuItem>
+            <MenuItem key={b._id} value={b._id}>
+              {b.name}
+            </MenuItem>
           ))}
-        </TextField>
+        </TextField> */}
       </Grid>
-
     </Grid>
   );
 };

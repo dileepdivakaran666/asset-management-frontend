@@ -140,7 +140,8 @@ const GRNReport = () => {
             Apply Filters
           </Button>
           <Button
-            variant="outlined"
+            variant="contained"
+            color="success"
             startIcon={<Download />}
             sx={{ ml: 2 }}
             onClick={handleExport}

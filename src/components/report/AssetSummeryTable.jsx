@@ -60,6 +60,7 @@ const AssetSummaryTable = () => {
         <Typography variant="h4">Asset Summary Report</Typography>
         <Button
           variant="contained"
+          color="success"
           startIcon={<DownloadIcon />}
           onClick={downloadExcel}
         >
