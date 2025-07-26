@@ -16,20 +16,20 @@ export const downloadExcelTemplate = () => {
   worksheet.addRow([]); // Empty row
   worksheet.addRow(['LINE ITEMS']);
   worksheet.addRow(['Subcategory', 'Item Description', 'Quantity', 'Unit Price', 'Tax %']);
-  
+
   // Set data validation for numeric fields
   const quantityCol = worksheet.getColumn(3);
-  
-  quantityCol.eachCell(cell => {
+
+  quantityCol.eachCell((cell) => {
     cell.dataValidation = {
       type: 'decimal',
       operator: 'greaterThan',
-      formulae: [0]
+      formulae: [0],
     };
   });
 
   // Generate and download
-  workbook.xlsx.writeBuffer().then(buffer => {
+  workbook.xlsx.writeBuffer().then((buffer) => {
     saveAs(new Blob([buffer]), 'GRN_Template.xlsx');
   });
 };
@@ -42,7 +42,7 @@ export const exportGRNToExcel = (grnData) => {
   // Add Header
   worksheet.addRow(['GRN Report']).font = { bold: true, size: 16 };
   worksheet.mergeCells('A1:H1');
-  
+
   // Add Metadata
   worksheet.addRow(['GRN Number:', grnData.grnNumber]);
   worksheet.addRow(['Date:', grnData.grnDate]);
@@ -50,8 +50,14 @@ export const exportGRNToExcel = (grnData) => {
 
   // Add Line Items Header
   worksheet.addRow([
-    '#', 'Subcategory', 'Item Description', 'Qty', 
-    'Unit Price', 'Tax %', 'Taxable Value', 'Total Amount'
+    '#',
+    'Subcategory',
+    'Item Description',
+    'Qty',
+    'Unit Price',
+    'Tax %',
+    'Taxable Value',
+    'Total Amount',
   ]).font = { bold: true };
 
   // Add Line Items
@@ -64,22 +70,25 @@ export const exportGRNToExcel = (grnData) => {
       item.unitPrice,
       item.tax,
       item.taxableValue,
-      item.totalAmount
+      item.totalAmount,
     ]);
   });
 
   // Add Summary
   worksheet.addRow(['', '', '', '', '', 'Subtotal:', grnData.subtotal]).font = { bold: true };
   worksheet.addRow(['', '', '', '', '', 'Total Tax:', grnData.totalTax]).font = { bold: true };
-  worksheet.addRow(['', '', '', '', '', 'Grand Total:', grnData.grandTotal]).font = { bold: true, color: { argb: 'FF0000' } };
+  worksheet.addRow(['', '', '', '', '', 'Grand Total:', grnData.grandTotal]).font = {
+    bold: true,
+    color: { argb: 'FF0000' },
+  };
 
   // Style columns
-  [3,4,5,6,7].forEach(col => {
+  [3, 4, 5, 6, 7].forEach((col) => {
     worksheet.getColumn(col).numFmt = '#,##0.00';
   });
 
   // Generate and download
-  workbook.xlsx.writeBuffer().then(buffer => {
+  workbook.xlsx.writeBuffer().then((buffer) => {
     saveAs(new Blob([buffer]), `GRN_${grnData.grnNumber}.xlsx`);
   });
 };
@@ -88,7 +97,7 @@ export const exportGRNToExcel = (grnData) => {
 export const importExcelData = async (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    
+
     reader.onload = (e) => {
       try {
         const data = new Uint8Array(e.target.result);
@@ -97,13 +106,11 @@ export const importExcelData = async (file) => {
         const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
 
         // Find header row (row with 'GRN HEADER INFORMATION')
-        const headerRowIndex = jsonData.findIndex(row => 
-          row[0] === 'GRN HEADER INFORMATION'
-        );
+        const headerRowIndex = jsonData.findIndex((row) => row[0] === 'GRN HEADER INFORMATION');
 
         const result = {
           header: {},
-          lineItems: []
+          lineItems: [],
         };
 
         // Extract header data (2 rows below header title)
@@ -114,26 +121,25 @@ export const importExcelData = async (file) => {
             grnDate: headerRow[1],
             invoiceNumber: headerRow[2],
             vendor: headerRow[3],
-            branch: headerRow[4]
+            branch: headerRow[4],
           };
         }
 
         // Find line items section (row with 'LINE ITEMS')
-        const itemsRowIndex = jsonData.findIndex(row => 
-          row[0] === 'LINE ITEMS'
-        );
+        const itemsRowIndex = jsonData.findIndex((row) => row[0] === 'LINE ITEMS');
 
         // Extract line items (2 rows below items title)
         if (itemsRowIndex >= 0) {
           for (let i = itemsRowIndex + 2; i < jsonData.length; i++) {
             const row = jsonData[i];
-            if (row && row[0]) { // Check if row has data
+            if (row && row[0]) {
+              // Check if row has data
               result.lineItems.push({
                 subcategory: row[0],
                 description: row[1],
                 quantity: row[2],
                 price: row[3],
-                tax: row[4]
+                tax: row[4],
               });
             }
           }
@@ -144,7 +150,7 @@ export const importExcelData = async (file) => {
         reject(error);
       }
     };
-    
+
     reader.onerror = reject;
     reader.readAsArrayBuffer(file);
   });

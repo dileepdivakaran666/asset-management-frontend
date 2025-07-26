@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import {
   TextField,
   Button,
@@ -11,13 +11,13 @@ import {
   Typography,
   CircularProgress,
   Box,
-} from "@mui/material";
-import { useSnackbar } from "notistack";
-import api from "../../api/axios";
+} from '@mui/material';
+import { useSnackbar } from 'notistack';
+import api from '../../api/axios';
 
 // ✅ Yup validation schema
 const schema = yup.object().shape({
-  name: yup.string().required("Name is required"),
+  name: yup.string().required('Name is required'),
   description: yup.string(),
   status: yup.boolean(),
 });
@@ -38,27 +38,28 @@ export default function AssetCategoryForm() {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      name: "",
-      description: "",
+      name: '',
+      description: '',
       status: true,
     },
   });
 
-  const status = watch("status");
+  const status = watch('status');
 
   // ✅ Fetch category data for edit
   useEffect(() => {
     if (id) {
       setLoading(true);
-      api.get(`/asset-categories/${id}`)
+      api
+        .get(`/asset-categories/${id}`)
         .then((res) => {
           const { name, description, status } = res.data;
-          setValue("name", name);
-          setValue("description", description);
-          setValue("status", status);
+          setValue('name', name);
+          setValue('description', description);
+          setValue('status', status);
         })
         .catch(() => {
-          enqueueSnackbar("Failed to load data", { variant: "error" });
+          enqueueSnackbar('Failed to load data', { variant: 'error' });
         })
         .finally(() => setLoading(false));
     }
@@ -68,21 +69,21 @@ export default function AssetCategoryForm() {
     try {
       if (id) {
         await api.put(`/asset-categories/${id}`, data);
-        enqueueSnackbar("Category updated successfully!", { variant: "success" });
+        enqueueSnackbar('Category updated successfully!', { variant: 'success' });
       } else {
-        await api.post("/asset-categories", data);
-        enqueueSnackbar("Category created successfully!", { variant: "success" });
+        await api.post('/asset-categories', data);
+        enqueueSnackbar('Category created successfully!', { variant: 'success' });
       }
-      navigate("/asset-categories");
+      navigate('/asset-categories');
     } catch (err) {
-      enqueueSnackbar("Something went wrong!", { variant: "error" });
+      enqueueSnackbar('Something went wrong!', { variant: 'error' });
     }
   };
 
   return (
-    <Box sx={{ maxWidth: 500, mx: "auto", mt: 4 }}>
+    <Box sx={{ maxWidth: 500, mx: 'auto', mt: 4 }}>
       <Typography variant="h4" gutterBottom>
-        {id ? "Edit" : "Create"} Asset Category
+        {id ? 'Edit' : 'Create'} Asset Category
       </Typography>
 
       {loading ? (
@@ -93,33 +94,25 @@ export default function AssetCategoryForm() {
             label="Name"
             fullWidth
             margin="normal"
-            {...register("name")}
+            {...register('name')}
             error={!!errors.name}
             helperText={errors.name?.message}
           />
 
-          <TextField
-            label="Description"
-            fullWidth
-            margin="normal"
-            {...register("description")}
-          />
+          <TextField label="Description" fullWidth margin="normal" {...register('description')} />
 
           <FormControlLabel
-            control={<Switch checked={status}
-      onChange={(e) => setValue("status", e.target.checked)} />}
+            control={
+              <Switch checked={status} onChange={(e) => setValue('status', e.target.checked)} />
+            }
             label="Active"
           />
 
           <Box sx={{ mt: 2 }}>
             <Button type="submit" variant="contained" color="primary">
-              {id ? "Update" : "Create"}
+              {id ? 'Update' : 'Create'}
             </Button>
-            <Button
-              sx={{ ml: 2 }}
-              variant="outlined"
-              onClick={() => navigate("/asset-categories")}
-            >
+            <Button sx={{ ml: 2 }} variant="outlined" onClick={() => navigate('/asset-categories')}>
               Cancel
             </Button>
           </Box>

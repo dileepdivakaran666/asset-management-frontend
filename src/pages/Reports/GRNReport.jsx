@@ -1,13 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
-  Box, Typography, TextField, Button, MenuItem, Table, TableHead, TableRow,
-  TableCell, TableBody, TableContainer, Paper, Grid
-} from "@mui/material";
-import { Download } from "@mui/icons-material";
-import { DatePicker } from "@mui/x-date-pickers";
-import dayjs from "dayjs";
-import { useSnackbar } from "notistack";
-import api from "../../api/axios";
+  Box,
+  Typography,
+  TextField,
+  Button,
+  MenuItem,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  TableContainer,
+  Paper,
+  Grid,
+} from '@mui/material';
+import { Download } from '@mui/icons-material';
+import { DatePicker } from '@mui/x-date-pickers';
+import dayjs from 'dayjs';
+import { useSnackbar } from 'notistack';
+import api from '../../api/axios';
 
 const GRNReport = () => {
   const [grns, setGrns] = useState([]);
@@ -18,15 +29,12 @@ const GRNReport = () => {
   const [filters, setFilters] = useState({
     from: null,
     to: null,
-    vendor: "",
-    branch: "",
+    vendor: '',
+    branch: '',
   });
 
   const fetchFilters = async () => {
-    const [vendorRes, branchRes] = await Promise.all([
-      api.get("/vendors"),
-      api.get("/branches"),
-    ]);
+    const [vendorRes, branchRes] = await Promise.all([api.get('/vendors'), api.get('/branches')]);
     setVendors(vendorRes.data);
     setBranches(branchRes.data);
   };
@@ -38,37 +46,35 @@ const GRNReport = () => {
     if (filters.vendor) params.vendor = filters.vendor;
     if (filters.branch) params.branch = filters.branch;
 
-    const res = await api.get("/grn-reports/report", { params });
+    const res = await api.get('/grn-reports/report', { params });
 
     setGrns(res.data);
   };
 
   const handleExport = async () => {
-  try {
-    const params = {};
-    if (filters.from) params.from = filters.from.toISOString();
-    if (filters.to) params.to = filters.to.toISOString();
-    if (filters.vendor) params.vendor = filters.vendor;
-    if (filters.branch) params.branch = filters.branch;
+    try {
+      const params = {};
+      if (filters.from) params.from = filters.from.toISOString();
+      if (filters.to) params.to = filters.to.toISOString();
+      if (filters.vendor) params.vendor = filters.vendor;
+      if (filters.branch) params.branch = filters.branch;
 
-    const response = await api.get(`/grn-reports/export`, {
-      params,
-      responseType: 'blob', // important!
-    });
-    const url = window.URL.createObjectURL(new Blob([response.data]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "GRN_Report.xlsx");
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-  } catch (error) {
-    console.error("Export error:", error);
-    enqueueSnackbar("Export failed", { variant: "error" });
-  }
-};
-
-
+      const response = await api.get(`/grn-reports/export`, {
+        params,
+        responseType: 'blob', // important!
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'GRN_Report.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error('Export error:', error);
+      enqueueSnackbar('Export failed', { variant: 'error' });
+    }
+  };
 
   useEffect(() => {
     fetchFilters();
@@ -102,7 +108,7 @@ const GRNReport = () => {
         </Grid>
         <Grid item xs={12} md={3}>
           <TextField
-          sx={{ minWidth: 200 }}
+            sx={{ minWidth: 200 }}
             select
             label="Vendor"
             fullWidth
@@ -119,7 +125,7 @@ const GRNReport = () => {
         </Grid>
         <Grid item xs={12} md={3}>
           <TextField
-          sx={{ minWidth: 200 }}
+            sx={{ minWidth: 200 }}
             select
             label="Branch"
             fullWidth
@@ -154,21 +160,21 @@ const GRNReport = () => {
       {/* Table */}
       <TableContainer component={Paper}>
         <Table>
-          <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
+          <TableHead sx={{ backgroundColor: '#c5cae9' }}>
             <TableRow>
-              <TableCell>GRN No.</TableCell>
-              <TableCell>Date</TableCell>
-              <TableCell>Invoice</TableCell>
-              <TableCell>Vendor</TableCell>
-              <TableCell>Branch</TableCell>
-              <TableCell>Total</TableCell>
+              <TableCell style={{ fontWeight: 'bold' }}>GRN No.</TableCell>
+              <TableCell style={{ fontWeight: 'bold' }}>Date</TableCell>
+              <TableCell style={{ fontWeight: 'bold' }}>Invoice</TableCell>
+              <TableCell style={{ fontWeight: 'bold' }}>Vendor</TableCell>
+              <TableCell style={{ fontWeight: 'bold' }}>Branch</TableCell>
+              <TableCell style={{ fontWeight: 'bold' }}>Total</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {grns.map((grn) => (
               <TableRow key={grn._id}>
                 <TableCell>{grn.grnNumber}</TableCell>
-                <TableCell>{dayjs(grn.grnDate).format("DD-MM-YYYY")}</TableCell>
+                <TableCell>{dayjs(grn.grnDate).format('DD-MM-YYYY')}</TableCell>
                 <TableCell>{grn.invoiceNumber}</TableCell>
                 <TableCell>{grn.vendorId?.name}</TableCell>
                 <TableCell>{grn.branchId?.name}</TableCell>

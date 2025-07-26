@@ -1,10 +1,7 @@
-
-import AssetSummaryTable from "../../components/report/AssetSummeryTable"
+import AssetSummaryTable from '../../components/report/AssetSummeryTable';
 
 function AssetSummery() {
-  return (
-    <AssetSummaryTable />
-  )
+  return <AssetSummaryTable />;
 }
 
-export default AssetSummery
+export default AssetSummery;

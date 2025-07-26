@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import api from "../../api/axios";
+import React, { useEffect, useState } from 'react';
+import api from '../../api/axios';
 import {
   Box,
   Typography,
@@ -12,8 +12,8 @@ import {
   Paper,
   Button,
   CircularProgress,
-} from "@mui/material";
-import { Download as DownloadIcon } from "@mui/icons-material";
+} from '@mui/material';
+import { Download as DownloadIcon } from '@mui/icons-material';
 
 const AssetSummaryTable = () => {
   const [summaryData, setSummaryData] = useState([]);
@@ -23,10 +23,10 @@ const AssetSummaryTable = () => {
   const fetchAssetSummary = async () => {
     try {
       setLoading(true);
-      const res = await api.get("/asset-summary");
+      const res = await api.get('/asset-summary');
       setSummaryData(res.data);
     } catch (error) {
-      console.error("Error fetching asset summary", error);
+      console.error('Error fetching asset summary', error);
     } finally {
       setLoading(false);
     }
@@ -35,18 +35,18 @@ const AssetSummaryTable = () => {
   // Download Excel
   const downloadExcel = async () => {
     try {
-      const res = await api.get("/asset-summary/export", {
-        responseType: "blob",
+      const res = await api.get('/asset-summary/export', {
+        responseType: 'blob',
       });
 
       const url = window.URL.createObjectURL(new Blob([res.data]));
-      const link = document.createElement("a");
+      const link = document.createElement('a');
       link.href = url;
-      link.setAttribute("download", "asset_summary.xlsx");
+      link.setAttribute('download', 'asset_summary.xlsx');
       document.body.appendChild(link);
       link.click();
     } catch (error) {
-      console.error("Download failed", error);
+      console.error('Download failed', error);
     }
   };
 
@@ -75,11 +75,11 @@ const AssetSummaryTable = () => {
       ) : (
         <TableContainer component={Paper}>
           <Table>
-            <TableHead>
+            <TableHead sx={{ backgroundColor: '#c5cae9' }}>
               <TableRow>
-                <TableCell>Category Name</TableCell>
-                <TableCell>Branch Name</TableCell>
-                <TableCell>Asset Count</TableCell>
+                <TableCell style={{ fontWeight: 'bold' }}>Category Name</TableCell>
+                <TableCell style={{ fontWeight: 'bold' }}>Branch Name</TableCell>
+                <TableCell style={{ fontWeight: 'bold' }}>Asset Count</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Table, TableHead, TableRow, TableCell, TableBody, Paper,
-  TableContainer, Typography, Button, Box, useTheme
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Paper,
+  TableContainer,
+  Typography,
+  Button,
+  Box,
+  useTheme,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
@@ -14,39 +23,46 @@ const GRNList = () => {
   const { enqueueSnackbar } = useSnackbar();
 
   const getStatusColor = (status) => {
-    switch(status) {
-      case 'submitted': return theme.palette.success.main;
-      case 'draft': return theme.palette.warning.main;
-      default: return theme.palette.text.secondary;
+    switch (status) {
+      case 'submitted':
+        return theme.palette.success.main;
+      case 'draft':
+        return theme.palette.warning.main;
+      default:
+        return theme.palette.text.secondary;
     }
   };
 
   useEffect(() => {
-    api.get('/grns').then(res => setGrns(res.data));
+    api.get('/grns').then((res) => setGrns(res.data));
   }, []);
 
   const handleDelete = async (id) => {
-  try {
-    await api.delete(`/grns/${id}`);
-    enqueueSnackbar("GRN deleted successfully", { variant: "success" });
-    setGrns((prev) => prev.filter((g) => g._id !== id));
-  } catch (error) {
-    enqueueSnackbar("Failed to delete GRN", { variant: "error" });
-  }
-};
+    try {
+      await api.delete(`/grns/${id}`);
+      enqueueSnackbar('GRN deleted successfully', { variant: 'success' });
+      setGrns((prev) => prev.filter((g) => g._id !== id));
+    } catch (error) {
+      enqueueSnackbar('Failed to delete GRN', { variant: 'error' });
+    }
+  };
 
   return (
     <Box p={3}>
-      <Typography variant="h4" gutterBottom>GRN List</Typography>
-      <Box sx={{ 
-        display: 'flex',
-        justifyContent: 'flex-end',
-        mb: 3, // margin bottom
-        pr: 2, // padding right
-      }}>
-        <Button 
+      <Typography variant="h4" gutterBottom>
+        GRN List
+      </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          mb: 3, // margin bottom
+          pr: 2, // padding right
+        }}
+      >
+        <Button
           size="small"
-          variant="contained" 
+          variant="contained"
           color="primary"
           onClick={() => navigate('/grn/new')}
           sx={{
@@ -60,7 +76,7 @@ const GRNList = () => {
 
       <TableContainer component={Paper}>
         <Table>
-          <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
+          <TableHead sx={{ backgroundColor: '#c5cae9' }}>
             <TableRow>
               <TableCell style={{ fontWeight: 'bold' }}>GRN No.</TableCell>
               <TableCell style={{ fontWeight: 'bold' }}>Invoice</TableCell>
@@ -69,11 +85,13 @@ const GRNList = () => {
               <TableCell style={{ fontWeight: 'bold' }}>Date</TableCell>
               <TableCell style={{ fontWeight: 'bold' }}>Status</TableCell>
               <TableCell style={{ fontWeight: 'bold' }}>Total</TableCell>
-              <TableCell style={{ fontWeight: 'bold' }} align="center">Actions</TableCell>
+              <TableCell style={{ fontWeight: 'bold' }} align="center">
+                Actions
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {grns.map(grn => (
+            {grns.map((grn) => (
               <TableRow key={grn._id}>
                 <TableCell>{grn.grnNumber}</TableCell>
                 <TableCell>{grn.invoiceNumber}</TableCell>
@@ -82,39 +100,60 @@ const GRNList = () => {
                 <TableCell>{new Date(grn.grnDate).toLocaleDateString()}</TableCell>
                 <TableCell>
                   <Box display="flex" alignItems="center">
-                                          <Box 
-                                            sx={{
-                                              width: 10,
-                                              height: 10,
-                                              borderRadius: '50%',
-                                              bgcolor: getStatusColor(grn.status),
-                                              mr: 1
-                                            }} 
-                                          />
-                                          <Typography 
-                                            variant="body2"
-                                            sx={{ 
-                                              textTransform: 'capitalize',
-                                              color: getStatusColor(grn.status)
-                                            }}
-                                          >
-                                            {grn.status}
-                                          </Typography>
-                                        </Box>
+                    <Box
+                      sx={{
+                        width: 10,
+                        height: 10,
+                        borderRadius: '50%',
+                        bgcolor: getStatusColor(grn.status),
+                        mr: 1,
+                      }}
+                    />
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        textTransform: 'capitalize',
+                        color: getStatusColor(grn.status),
+                      }}
+                    >
+                      {grn.status}
+                    </Typography>
+                  </Box>
                 </TableCell>
-                <TableCell>
-                  ₹ {grn.grandTotal?.toFixed(2) ?? 'N/A'}
-                </TableCell>
+                <TableCell>₹ {grn.grandTotal?.toFixed(2) ?? 'N/A'}</TableCell>
                 <TableCell align="center">
-                  <Button size="small" variant="outlined" color="primary" onClick={() => navigate(`/grn/view/${grn._id}`)}>View</Button>{' '}
-                  <Button size="small" variant="outlined" color="secondary" onClick={() => navigate(`/grn/edit/${grn._id}`)}>Edit</Button>{' '}
-                  <Button size="small" variant="outlined" color="error" onClick={() => handleDelete(grn._id)}>Delete</Button>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    color="primary"
+                    onClick={() => navigate(`/grn/view/${grn._id}`)}
+                  >
+                    View
+                  </Button>{' '}
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    color="secondary"
+                    onClick={() => navigate(`/grn/edit/${grn._id}`)}
+                  >
+                    Edit
+                  </Button>{' '}
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    color="error"
+                    onClick={() => handleDelete(grn._id)}
+                  >
+                    Delete
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
             {grns.length === 0 && (
               <TableRow>
-                <TableCell colSpan={8} align="center">No GRNs found.</TableCell>
+                <TableCell colSpan={8} align="center">
+                  No GRNs found.
+                </TableCell>
               </TableRow>
             )}
           </TableBody>

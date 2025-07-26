@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import {
   TextField,
   Button,
@@ -15,14 +15,14 @@ import {
   Typography,
   CircularProgress,
   Box,
-} from "@mui/material";
-import { useSnackbar } from "notistack";
-import api from "../../api/axios";
+} from '@mui/material';
+import { useSnackbar } from 'notistack';
+import api from '../../api/axios';
 
 // Validation Schema
 const schema = yup.object().shape({
-  categoryId: yup.string().required("Category is required"),
-  name: yup.string().required("Name is required"),
+  categoryId: yup.string().required('Category is required'),
+  name: yup.string().required('Name is required'),
   description: yup.string(),
   status: yup.boolean(),
 });
@@ -44,34 +44,35 @@ export default function AssetSubcategoryForm() {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      categoryId: "",
-      name: "",
-      description: "",
+      categoryId: '',
+      name: '',
+      description: '',
       status: true,
     },
   });
 
-  const status = watch("status");
+  const status = watch('status');
 
   useEffect(() => {
     // Load categories
-    api.get("/asset-categories").then((res) => {
+    api.get('/asset-categories').then((res) => {
       setCategories(res.data);
     });
 
     // If editing, load subcategory
     if (id) {
       setLoading(true);
-      api.get(`/asset-subcategories/${id}`)
+      api
+        .get(`/asset-subcategories/${id}`)
         .then((res) => {
           const { categoryId, name, description, status } = res.data;
-          setValue("categoryId", categoryId._id);
-          setValue("name", name);
-          setValue("description", description);
-          setValue("status", status);
+          setValue('categoryId', categoryId._id);
+          setValue('name', name);
+          setValue('description', description);
+          setValue('status', status);
         })
         .catch(() => {
-          enqueueSnackbar("Failed to load data", { variant: "error" });
+          enqueueSnackbar('Failed to load data', { variant: 'error' });
         })
         .finally(() => setLoading(false));
     }
@@ -81,21 +82,21 @@ export default function AssetSubcategoryForm() {
     try {
       if (id) {
         await api.put(`/asset-subcategories/${id}`, data);
-        enqueueSnackbar("Subcategory updated successfully!", { variant: "success" });
+        enqueueSnackbar('Subcategory updated successfully!', { variant: 'success' });
       } else {
-        await api.post("/asset-subcategories", data);
-        enqueueSnackbar("Subcategory created successfully!", { variant: "success" });
+        await api.post('/asset-subcategories', data);
+        enqueueSnackbar('Subcategory created successfully!', { variant: 'success' });
       }
-      navigate("/asset-subcategories");
+      navigate('/asset-subcategories');
     } catch (err) {
-      enqueueSnackbar("Something went wrong!", { variant: "error" });
+      enqueueSnackbar('Something went wrong!', { variant: 'error' });
     }
   };
 
   return (
-    <Box sx={{ maxWidth: 500, mx: "auto", mt: 4 }}>
+    <Box sx={{ maxWidth: 500, mx: 'auto', mt: 4 }}>
       <Typography variant="h4" gutterBottom>
-        {id ? "Edit" : "Create"} Asset Subcategory
+        {id ? 'Edit' : 'Create'} Asset Subcategory
       </Typography>
 
       {loading ? (
@@ -105,9 +106,9 @@ export default function AssetSubcategoryForm() {
           <FormControl fullWidth margin="normal">
             <InputLabel>Category</InputLabel>
             <Select
-              {...register("categoryId")}
-              value={watch("categoryId")}
-              onChange={(e) => setValue("categoryId", e.target.value)}
+              {...register('categoryId')}
+              value={watch('categoryId')}
+              onChange={(e) => setValue('categoryId', e.target.value)}
               error={!!errors.categoryId}
             >
               {categories.map((cat) => (
@@ -125,32 +126,28 @@ export default function AssetSubcategoryForm() {
             label="Name"
             fullWidth
             margin="normal"
-            {...register("name")}
+            {...register('name')}
             error={!!errors.name}
             helperText={errors.name?.message}
           />
 
-          <TextField
-            label="Description"
-            fullWidth
-            margin="normal"
-            {...register("description")}
-          />
+          <TextField label="Description" fullWidth margin="normal" {...register('description')} />
 
           <FormControlLabel
-            control={<Switch checked={status}
-      onChange={(e) => setValue("status", e.target.checked)} />}
+            control={
+              <Switch checked={status} onChange={(e) => setValue('status', e.target.checked)} />
+            }
             label="Active"
           />
 
           <Box sx={{ mt: 2 }}>
             <Button type="submit" variant="contained" color="primary">
-              {id ? "Update" : "Create"}
+              {id ? 'Update' : 'Create'}
             </Button>
             <Button
               sx={{ ml: 2 }}
               variant="outlined"
-              onClick={() => navigate("/asset-subcategories")}
+              onClick={() => navigate('/asset-subcategories')}
             >
               Cancel
             </Button>

@@ -21,33 +21,33 @@ const TotalsPanel = ({ control }) => {
   const grandTotal = subtotal + totalTax;
 
   return (
-    <Paper 
-      elevation={2} 
-      sx={{ 
-        p: 2, 
+    <Paper
+      elevation={2}
+      sx={{
+        p: 2,
         mt: 2,
         width: { xs: '100%', lg: 300 },
         ml: 'auto',
-        textAlign: { xs: 'left', lg: 'right' }
+        textAlign: { xs: 'left', lg: 'right' },
       }}
     >
       <Typography variant="subtitle1" gutterBottom>
         Totals & Summary
       </Typography>
       <Divider sx={{ my: 1 }} />
-      
+
       <Box display="flex" justifyContent="space-between">
         <Typography>Subtotal:</Typography>
         <Typography>₹{subtotal.toFixed(2)}</Typography>
       </Box>
-      
+
       <Box display="flex" justifyContent="space-between" mt={1}>
         <Typography>Total Tax:</Typography>
         <Typography>₹{totalTax.toFixed(2)}</Typography>
       </Box>
-      
+
       <Divider sx={{ my: 2 }} />
-      
+
       <Box display="flex" justifyContent="space-between">
         <Typography variant="subtitle1">Grand Total:</Typography>
         <Typography variant="subtitle1">₹{grandTotal.toFixed(2)}</Typography>

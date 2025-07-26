@@ -14,7 +14,7 @@ import {
   Button,
   Toolbar,
   Typography,
-  InputAdornment
+  InputAdornment,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -46,162 +46,162 @@ const LineItemTable = ({ control, fields, append, remove, register, errors, subc
 
   return (
     <Box sx={{ width: '100%', overflowX: 'auto' }}>
-    <TableContainer component={Paper} sx={{ mt: 2 }}>
-      <Toolbar sx={{ pl: 0, pr: 0 }}>
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          Line Items
-        </Typography>
-        <Button
-          startIcon={<AddIcon />}
-          onClick={() =>
-            append({
-              subcategoryId: '',
-              itemDescription: '',
-              quantity: '',
-              unitPrice: '',
-              taxPercent: '',
-              taxableValue: 0,
-              totalAmount: 0
-            })
-          }
-          variant="outlined"
-        >
-          Add Row
-        </Button>
-      </Toolbar>
+      <TableContainer component={Paper} sx={{ mt: 2 }}>
+        <Toolbar sx={{ pl: 0, pr: 0 }}>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            Line Items
+          </Typography>
+          <Button
+            startIcon={<AddIcon />}
+            onClick={() =>
+              append({
+                subcategoryId: '',
+                itemDescription: '',
+                quantity: '',
+                unitPrice: '',
+                taxPercent: '',
+                taxableValue: 0,
+                totalAmount: 0,
+              })
+            }
+            variant="outlined"
+          >
+            Add Row
+          </Button>
+        </Toolbar>
 
-      <Table size="small"  sx={{ minWidth: 1000 }}>
-        <TableHead>
-          <TableRow>
-            <TableCell>#</TableCell>
-            <TableCell>Subcategory</TableCell>
-            <TableCell>Item Description</TableCell>
-            <TableCell align="right">Qty</TableCell>
-            <TableCell align="right">Unit Price</TableCell>
-            <TableCell align="right">Tax %</TableCell>
-            <TableCell align="right">Taxable Value</TableCell>
-            <TableCell align="right">Total Amount</TableCell>
-            <TableCell>Actions</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {fields.map((item, index) => {
-            const qty = parseFloat(lineItems?.[index]?.quantity || 0);
-            const price = parseFloat(lineItems?.[index]?.unitPrice || 0);
-            const tax = parseFloat(lineItems?.[index]?.taxPercent || 0);
+        <Table size="small" sx={{ minWidth: 1000 }}>
+          <TableHead style={{ backgroundColor: '#c5cae9' }}>
+            <TableRow>
+              <TableCell>#</TableCell>
+              <TableCell>Subcategory</TableCell>
+              <TableCell>Item Description</TableCell>
+              <TableCell align="right">Qty</TableCell>
+              <TableCell align="right">Unit Price</TableCell>
+              <TableCell align="right">Tax %</TableCell>
+              <TableCell align="right">Taxable Value</TableCell>
+              <TableCell align="right">Total Amount</TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {fields.map((item, index) => {
+              const qty = parseFloat(lineItems?.[index]?.quantity || 0);
+              const price = parseFloat(lineItems?.[index]?.unitPrice || 0);
+              const tax = parseFloat(lineItems?.[index]?.taxPercent || 0);
 
-            const taxableValue = qty * price;
-            const taxAmount = (taxableValue * tax) / 100;
-            const totalAmount = taxableValue + taxAmount;
+              const taxableValue = qty * price;
+              const taxAmount = (taxableValue * tax) / 100;
+              const totalAmount = taxableValue + taxAmount;
 
-            return (
-              <TableRow key={item.id}>
-                <TableCell>{index + 1}</TableCell>
-                <TableCell>
-                  <TextField
-                    select
-                    fullWidth
-                    size="small"
-                    variant="standard"
-                    {...register(`lineItems.${index}.subcategoryId`)}
-                    error={Boolean(errors.lineItems?.[index]?.subcategoryId)}
-                    helperText={errors.lineItems?.[index]?.subcategoryId?.message}
-                    value={watch(`lineItems.${index}.subcategoryId`) || ''}
-                  >
-                    {subcategories.map(sub => (
-                      <MenuItem key={sub._id} value={sub._id}>
-                        {sub.name}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    variant="standard"
-                    {...register(`lineItems.${index}.itemDescription`)}
-                    error={Boolean(errors.lineItems?.[index]?.itemDescription)}
-                    helperText={errors.lineItems?.[index]?.itemDescription?.message}
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    variant="standard"
-                    type="number"
-                    {...register(`lineItems.${index}.quantity`)}
-                    error={Boolean(errors.lineItems?.[index]?.quantity)}
-                    helperText={errors.lineItems?.[index]?.quantity?.message}
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    variant="standard"
-                    type="number"
-                    InputProps={{
-                      startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                    }}
-                    {...register(`lineItems.${index}.unitPrice`)}
-                    error={Boolean(errors.lineItems?.[index]?.unitPrice)}
-                    helperText={errors.lineItems?.[index]?.unitPrice?.message}
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    variant="standard"
-                    type="number"
-                    InputProps={{
-                      endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                    }}
-                    inputProps={{ min: 0, max: 100 }}
-                    {...register(`lineItems.${index}.taxPercent`)}
-                    error={Boolean(errors.lineItems?.[index]?.taxPercent)}
-                    helperText={errors.lineItems?.[index]?.taxPercent?.message}
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    variant="standard"
-                    value={taxableValue.toFixed(2)}
-                    InputProps={{
-                      startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                      readOnly: true,
-                    }}
-                    {...register(`lineItems.${index}.taxableValue`)}
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    variant="standard"
-                    value={totalAmount.toFixed(2)}
-                    InputProps={{
-                      startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                      readOnly: true,
-                    }}
-                    {...register(`lineItems.${index}.totalAmount`)}
-                  />
-                </TableCell>
-                <TableCell>
-                  <IconButton onClick={() => remove(index)} color="error" size="small">
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </TableContainer>
+              return (
+                <TableRow key={item.id}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>
+                    <TextField
+                      select
+                      fullWidth
+                      size="small"
+                      variant="standard"
+                      {...register(`lineItems.${index}.subcategoryId`)}
+                      error={Boolean(errors.lineItems?.[index]?.subcategoryId)}
+                      helperText={errors.lineItems?.[index]?.subcategoryId?.message}
+                      value={watch(`lineItems.${index}.subcategoryId`) || ''}
+                    >
+                      {subcategories.map((sub) => (
+                        <MenuItem key={sub._id} value={sub._id}>
+                          {sub.name}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      variant="standard"
+                      {...register(`lineItems.${index}.itemDescription`)}
+                      error={Boolean(errors.lineItems?.[index]?.itemDescription)}
+                      helperText={errors.lineItems?.[index]?.itemDescription?.message}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      variant="standard"
+                      type="number"
+                      {...register(`lineItems.${index}.quantity`)}
+                      error={Boolean(errors.lineItems?.[index]?.quantity)}
+                      helperText={errors.lineItems?.[index]?.quantity?.message}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      variant="standard"
+                      type="number"
+                      InputProps={{
+                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                      }}
+                      {...register(`lineItems.${index}.unitPrice`)}
+                      error={Boolean(errors.lineItems?.[index]?.unitPrice)}
+                      helperText={errors.lineItems?.[index]?.unitPrice?.message}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      variant="standard"
+                      type="number"
+                      InputProps={{
+                        endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                      }}
+                      inputProps={{ min: 0, max: 100 }}
+                      {...register(`lineItems.${index}.taxPercent`)}
+                      error={Boolean(errors.lineItems?.[index]?.taxPercent)}
+                      helperText={errors.lineItems?.[index]?.taxPercent?.message}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      variant="standard"
+                      value={taxableValue.toFixed(2)}
+                      InputProps={{
+                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                        readOnly: true,
+                      }}
+                      {...register(`lineItems.${index}.taxableValue`)}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      variant="standard"
+                      value={totalAmount.toFixed(2)}
+                      InputProps={{
+                        startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                        readOnly: true,
+                      }}
+                      {...register(`lineItems.${index}.totalAmount`)}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <IconButton onClick={() => remove(index)} color="error" size="small">
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Box>
   );
 };

@@ -15,7 +15,7 @@ import {
   useMediaQuery,
   AppBar,
   Toolbar,
-  Collapse
+  Collapse,
 } from '@mui/material';
 import {
   ChevronLeft,
@@ -29,7 +29,7 @@ import {
   Assessment,
   Menu as MenuIcon,
   ExpandLess,
-  ExpandMore
+  ExpandMore,
 } from '@mui/icons-material';
 import { NavLink } from 'react-router-dom';
 
@@ -66,9 +66,9 @@ const Sidebar = () => {
   };
 
   const toggleSubItems = (text) => {
-    setExpandedItems(prev => ({
+    setExpandedItems((prev) => ({
       ...prev,
-      [text]: !prev[text]
+      [text]: !prev[text],
     }));
   };
 
@@ -81,10 +81,14 @@ const Sidebar = () => {
     },
     {
       text: 'Reports',
-      icon: <SvgIcon color="primary"><Assessment /></SvgIcon>,
+      icon: (
+        <SvgIcon color="primary">
+          <Assessment />
+        </SvgIcon>
+      ),
       subItems: [
         { text: 'GRN Register', path: '/reports/grn-register' },
-        { text: 'Asset Summary', path: '/reports/asset-summary' }
+        { text: 'Asset Summary', path: '/reports/asset-summary' },
       ],
     },
     {
@@ -105,9 +109,7 @@ const Sidebar = () => {
   const drawerContent = (
     <>
       <DrawerHeader>
-        <IconButton onClick={toggleDrawer}>
-          {open ? <ChevronLeft /> : <ChevronRight />}
-        </IconButton>
+        <IconButton onClick={toggleDrawer}>{open ? <ChevronLeft /> : <ChevronRight />}</IconButton>
       </DrawerHeader>
       <Divider />
       <List>
@@ -168,16 +170,16 @@ const Sidebar = () => {
                       <SvgIcon color="primary">{item.icon}</SvgIcon>
                     </ListItemIcon>
                     <ListItemText primary={item.text} sx={{ opacity: open ? 1 : 0 }} />
-                    {open && item.subItems && (
-                      expandedItems[item.text] ? <ExpandLess /> : <ExpandMore />
-                    )}
+                    {open &&
+                      item.subItems &&
+                      (expandedItems[item.text] ? <ExpandLess /> : <ExpandMore />)}
                   </ListItemButton>
                 </Tooltip>
 
                 {item.subItems && (
-                  <Collapse 
-                    in={(isMobile && mobileOpen) || (!isMobile && open && expandedItems[item.text])} 
-                    timeout="auto" 
+                  <Collapse
+                    in={(isMobile && mobileOpen) || (!isMobile && open && expandedItems[item.text])}
+                    timeout="auto"
                     unmountOnExit
                   >
                     <List disablePadding>
@@ -221,12 +223,7 @@ const Sidebar = () => {
       {isMobile && (
         <AppBar position="fixed" sx={{ zIndex: theme.zIndex.drawer + 1 }}>
           <Toolbar>
-            <IconButton
-              color="inherit"
-              edge="start"
-              onClick={toggleDrawer}
-              sx={{ mr: 2 }}
-            >
+            <IconButton color="inherit" edge="start" onClick={toggleDrawer} sx={{ mr: 2 }}>
               <MenuIcon />
             </IconButton>
             <ListItemText primary="Asset Management" sx={{ color: 'white' }} />
@@ -240,10 +237,10 @@ const Sidebar = () => {
         open={isMobile ? mobileOpen : open}
         onClose={toggleDrawer}
         sx={{
-          width: isMobile ? drawerWidth : (open ? drawerWidth : 72),
+          width: isMobile ? drawerWidth : open ? drawerWidth : 72,
           flexShrink: 0,
           '& .MuiDrawer-paper': {
-            width: isMobile ? drawerWidth : (open ? drawerWidth : 72),
+            width: isMobile ? drawerWidth : open ? drawerWidth : 72,
             transition: theme.transitions.create('width', {
               easing: theme.transitions.easing.sharp,
               duration: theme.transitions.duration.enteringScreen,

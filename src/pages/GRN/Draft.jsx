@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Table, TableHead, TableRow, TableCell, TableBody, Paper,
-  TableContainer, Typography, Button, Box
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Paper,
+  TableContainer,
+  Typography,
+  Button,
+  Box,
 } from '@mui/material';
 import api from '../../api/axios';
 
@@ -9,15 +17,17 @@ const DraftGRNList = () => {
   const [grns, setGrns] = useState([]);
 
   useEffect(() => {
-    api.get('/grns').then(res => {
-      const draftsOnly = res.data.filter(grn => grn.status === 'draft');
+    api.get('/grns').then((res) => {
+      const draftsOnly = res.data.filter((grn) => grn.status === 'draft');
       setGrns(draftsOnly);
     });
   }, []);
 
   return (
     <Box p={3}>
-      <Typography variant="h5" gutterBottom>GRN Drafts</Typography>
+      <Typography variant="h5" gutterBottom>
+        GRN Drafts
+      </Typography>
 
       <TableContainer component={Paper}>
         <Table>
@@ -33,7 +43,7 @@ const DraftGRNList = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {grns.map(grn => (
+            {grns.map((grn) => (
               <TableRow key={grn._id}>
                 <TableCell>{grn.grnNumber}</TableCell>
                 <TableCell>{grn.invoiceNumber}</TableCell>
@@ -44,14 +54,20 @@ const DraftGRNList = () => {
                   <strong style={{ color: '#f57c00' }}>Draft</strong>
                 </TableCell>
                 <TableCell align="center">
-                  <Button variant="outlined" size="small">Edit</Button>{' '}
-                  <Button variant="outlined" size="small" color="error">Delete</Button>
+                  <Button variant="outlined" size="small">
+                    Edit
+                  </Button>{' '}
+                  <Button variant="outlined" size="small" color="error">
+                    Delete
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
             {grns.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} align="center">No Draft GRNs Found</TableCell>
+                <TableCell colSpan={7} align="center">
+                  No Draft GRNs Found
+                </TableCell>
               </TableRow>
             )}
           </TableBody>

@@ -25,7 +25,6 @@ client/
 │ ├── utils/ # Excel utils
 │ └── App.js # Main App with routes
 
-
 ---
 
 ## 📦 Installation
@@ -36,10 +35,12 @@ npm install
 
 npm start
 ```
- - The app will run at:  http://localhost:3000
+
+- The app will run at: http://localhost:3000
 - Make sure your backend is running at http://localhost:5000.
 
 ## Check src/api/axios.js and set the correct backend base URL:
+
     const api = axios.create({
     baseURL: 'http://localhost:5000/api',
     });

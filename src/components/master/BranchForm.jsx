@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import {
   TextField,
   Button,
@@ -11,14 +11,14 @@ import {
   Typography,
   CircularProgress,
   Box,
-} from "@mui/material";
-import { useSnackbar } from "notistack";
-import api from "../../api/axios";
+} from '@mui/material';
+import { useSnackbar } from 'notistack';
+import api from '../../api/axios';
 
 const schema = yup.object().shape({
-  name: yup.string().required("Branch name is required"),
+  name: yup.string().required('Branch name is required'),
   location: yup.string(),
-  code: yup.string().required("Branch code is required"),
+  code: yup.string().required('Branch code is required'),
   status: yup.boolean(),
 });
 
@@ -38,9 +38,9 @@ export default function BranchForm() {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      name: "",
-      location: "",
-      code: "",
+      name: '',
+      location: '',
+      code: '',
       status: true,
     },
   });
@@ -48,16 +48,17 @@ export default function BranchForm() {
   useEffect(() => {
     if (id) {
       setLoading(true);
-      api.get(`/branches/${id}`)
+      api
+        .get(`/branches/${id}`)
         .then((res) => {
           const { name, location, code, status } = res.data;
-          setValue("name", name);
-          setValue("location", location);
-          setValue("code", code);
-          setValue("status", status);
+          setValue('name', name);
+          setValue('location', location);
+          setValue('code', code);
+          setValue('status', status);
         })
         .catch(() => {
-          enqueueSnackbar("Failed to load branch", { variant: "error" });
+          enqueueSnackbar('Failed to load branch', { variant: 'error' });
         })
         .finally(() => setLoading(false));
     }
@@ -67,21 +68,21 @@ export default function BranchForm() {
     try {
       if (id) {
         await api.put(`/branches/${id}`, data);
-        enqueueSnackbar("Branch updated successfully!", { variant: "success" });
+        enqueueSnackbar('Branch updated successfully!', { variant: 'success' });
       } else {
-        await api.post("/branches", data);
-        enqueueSnackbar("Branch created successfully!", { variant: "success" });
+        await api.post('/branches', data);
+        enqueueSnackbar('Branch created successfully!', { variant: 'success' });
       }
-      navigate("/branches");
+      navigate('/branches');
     } catch (err) {
-      enqueueSnackbar("Something went wrong!", { variant: "error" });
+      enqueueSnackbar('Something went wrong!', { variant: 'error' });
     }
   };
 
   return (
-    <Box sx={{ maxWidth: 500, mx: "auto", mt: 4 }}>
+    <Box sx={{ maxWidth: 500, mx: 'auto', mt: 4 }}>
       <Typography variant="h4" gutterBottom>
-        {id ? "Edit" : "Create"} Branch
+        {id ? 'Edit' : 'Create'} Branch
       </Typography>
 
       {loading ? (
@@ -92,47 +93,42 @@ export default function BranchForm() {
             label="Branch Name"
             fullWidth
             margin="normal"
-            {...register("name")}
+            {...register('name')}
             error={!!errors.name}
             helperText={errors.name?.message}
           />
-          <TextField
-            label="Location"
-            fullWidth
-            margin="normal"
-            {...register("location")}
-          />
+          <TextField label="Location" fullWidth margin="normal" {...register('location')} />
           <TextField
             label="Branch Code"
             fullWidth
             margin="normal"
-            {...register("code")}
+            {...register('code')}
             error={!!errors.code}
             helperText={errors.code?.message}
           />
           <FormControlLabel
             control={
-                <Controller
+              <Controller
                 name="status"
                 control={control}
                 defaultValue={true}
                 render={({ field }) => (
-                    <Switch
+                  <Switch
                     {...field}
                     checked={field.value}
                     onChange={(e) => field.onChange(e.target.checked)}
-                    />
+                  />
                 )}
-                />
+              />
             }
             label="Active"
-            />
+          />
 
           <Box sx={{ mt: 2 }}>
             <Button type="submit" variant="contained" color="primary">
-              {id ? "Update" : "Create"}
+              {id ? 'Update' : 'Create'}
             </Button>
-            <Button sx={{ ml: 2 }} variant="outlined" onClick={() => navigate("/branches")}>
+            <Button sx={{ ml: 2 }} variant="outlined" onClick={() => navigate('/branches')}>
               Cancel
             </Button>
           </Box>

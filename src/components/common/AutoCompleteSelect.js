@@ -26,10 +26,10 @@ const AutoCompleteSelect = ({
           getOptionLabel={getOptionLabel}
           isOptionEqualToValue={isOptionEqualToValue}
           onChange={(_, data) => onChange(data?._id || '')}
-          value={options.find(opt => opt._id === value) || null}
+          value={options.find((opt) => opt._id === value) || null}
           renderInput={(params) => (
             <TextField
-            sx={{ minWidth: { xs: '100%', sm: 200 }, }}
+              sx={{ minWidth: { xs: '100%', sm: 200 } }}
               {...params}
               label={label}
               fullWidth
