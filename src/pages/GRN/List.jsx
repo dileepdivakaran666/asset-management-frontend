@@ -11,6 +11,11 @@ import {
   Button,
   Box,
   useTheme,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
@@ -18,6 +23,8 @@ import api from '../../api/axios';
 
 const GRNList = () => {
   const [grns, setGrns] = useState([]);
+  const [deleteId, setDeleteId] = useState(null);
+  const [openConfirm, setOpenConfirm] = useState(false);
   const theme = useTheme();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -37,14 +44,21 @@ const GRNList = () => {
     api.get('/grns').then((res) => setGrns(res.data));
   }, []);
 
-  const handleDelete = async (id) => {
+  const confirmDelete = (id) => {
+    setDeleteId(id);
+    setOpenConfirm(true);
+  };
+
+  const handleDeleteConfirmed = async () => {
     try {
-      await api.delete(`/grns/${id}`);
+      await api.delete(`/grns/${deleteId}`);
       enqueueSnackbar('GRN deleted successfully', { variant: 'success' });
-      setGrns((prev) => prev.filter((g) => g._id !== id));
+      setGrns((prev) => prev.filter((g) => g._id !== deleteId));
     } catch (error) {
       enqueueSnackbar('Failed to delete GRN', { variant: 'error' });
     }
+    setOpenConfirm(false);
+    setDeleteId(null);
   };
 
   return (
@@ -142,7 +156,7 @@ const GRNList = () => {
                     size="small"
                     variant="outlined"
                     color="error"
-                    onClick={() => handleDelete(grn._id)}
+                    onClick={() => confirmDelete(grn._id)}
                   >
                     Delete
                   </Button>
@@ -159,6 +173,22 @@ const GRNList = () => {
           </TableBody>
         </Table>
       </TableContainer>
+      <Dialog open={openConfirm} onClose={() => setOpenConfirm(false)}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this grn? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenConfirm(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDeleteConfirmed} color="error" autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
